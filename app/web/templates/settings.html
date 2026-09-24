@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Settings</h1>
+  <form method="post" class="form">
+    <h2>Recipients</h2>
+    <label>Accountant/finance email address(es), comma separated
+      <input type="text" name="recipient_emails" value="{{ settings.recipient_emails | join(', ') }}" required>
+    </label>
+
+    <h2>Outbound email (SMTP)</h2>
+    <p class="hint">For Gmail: host <b>smtp.gmail.com</b>, port <b>587</b>, STARTTLS on, and use a Google App Password rather than your normal Gmail password.</p>
+    <label>SMTP host
+      <input type="text" name="smtp_host" value="{{ settings.smtp_host or '' }}" placeholder="smtp.gmail.com">
+    </label>
+    <label>SMTP port
+      <input type="number" name="smtp_port" value="{{ settings.smtp_port or 587 }}" min="1" max="65535">
+    </label>
+    <label>SMTP username
+      <input type="text" name="smtp_username" value="{{ settings.smtp_username or '' }}">
+    </label>
+    <label>SMTP password / app password
+      <input type="password" name="smtp_password" placeholder="Leave blank to keep current password">
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" name="smtp_use_tls" {% if settings.smtp_use_tls %}checked{% endif %}> Use STARTTLS
+    </label>
+    <label>Sender email
+      <input type="text" name="sender_email" value="{{ settings.sender_email or '' }}">
+    </label>
+
+    <h2>Schedule</h2>
+    <label>Schedule type
+      <select name="schedule_type">
+        <option value="days" {% if settings.schedule_type == 'days' %}selected{% endif %}>Every N days</option>
+        <option value="monthly" {% if settings.schedule_type == 'monthly' %}selected{% endif %}>Monthly (day 1–28, 06:00 local)</option>
+        <option value="cron" {% if settings.schedule_type == 'cron' %}selected{% endif %}>Custom cron expression</option>
+      </select>
+    </label>
+    <label>Schedule value
+      <input type="text" name="schedule_value" value="{{ settings.schedule_value }}" placeholder="15 / 1 / 0 6 * *">
+    </label>
+
+    <button type="submit" class="btn btn-primary">Save settings</button>
+  </form>
+{% endblock %}

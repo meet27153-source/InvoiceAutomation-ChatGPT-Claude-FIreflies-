@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Logs</h1>
+  <h2>Run history</h2>
+  <table class="table">
+    <tr><th>Account</th><th>Started</th><th>Finished</th><th>Status</th><th>Detail</th></tr>
+    {% for r in runs %}
+      <tr><td>{{ r.account_label }}</td><td>{{ r.started_at }}</td><td>{{ r.finished_at or '-' }}</td><td>{{ r.status }}</td><td>{{ r.detail }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>Processed invoices</h2>
+  <p class="hint">Resetting an invoice removes its duplicate-protection record, so the next successful run may send it again.</p>
+  <table class="table">
+    <tr><th>Account</th><th>Invoice ID</th><th>Emailed at</th><th></th></tr>
+    {% for i in invoices %}
+      <tr>
+        <td>{{ i.account_label }}</td><td>{{ i.invoice_external_id }}</td><td>{{ i.emailed_at }}</td>
+        <td><form method="post" action="{{ url_for('main.delete_processed', row_id=i.id) }}" onsubmit="return confirm('Allow this invoice to be re-sent?');"><button type="submit" class="btn btn-sm btn-danger">Reset</button></form></td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

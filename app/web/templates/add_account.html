@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Add subscription account</h1>
+  <form method="post" class="form">
+    <label>Service
+      <select name="service" id="service" required>
+        {% for slug, cls in services.items() %}
+          <option value="{{ slug }}">{{ cls.display_name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Billing/account type
+      <select name="account_type" id="account_type" required></select>
+    </label>
+    <p class="hint">Choose the billing system that actually contains the invoice. ChatGPT and OpenAI API billing are separate.</p>
+
+    <label>Label
+      <input type="text" name="label" placeholder="Company OpenAI account" required>
+    </label>
+
+    <label>Username / email
+      <input type="text" name="username" required>
+    </label>
+
+    <label>Password <span class="hint">(optional when you will authenticate manually)</span>
+      <input type="password" name="password">
+    </label>
+    <p class="hint">Passwords are encrypted locally. MFA/CAPTCHA is never bypassed.</p>
+
+    <button type="submit" class="btn btn-primary">Save account</button>
+  </form>
+
+  <script>
+    const serviceTypes = {
+      {% for slug, cls in services.items() %}
+        "{{ slug }}": {{ cls.account_types | tojson }},
+      {% endfor %}
+    };
+    const serviceSelect = document.getElementById('service');
+    const typeSelect = document.getElementById('account_type');
+    function refreshTypes() {
+      typeSelect.innerHTML = '';
+      (serviceTypes[serviceSelect.value] || [['default', 'Default']]).forEach(([value, label]) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label;
+        typeSelect.appendChild(option);
+      });
+    }
+    serviceSelect.addEventListener('change', refreshTypes);
+    refreshTypes();
+  </script>
+{% endblock %}

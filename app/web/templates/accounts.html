@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Accounts</h1>
+  <p class="hint">Authenticate each enabled account once in your existing Chrome session. Scheduled runs reuse that signed-in browser session until the provider requires re-authentication.</p>
+  <a class="btn btn-primary" href="{{ url_for('main.add_account') }}">+ Add account</a>
+
+  {% if accounts %}
+  <table class="table">
+    <tr><th>Label</th><th>Service</th><th>Type</th><th>Username</th><th>Status</th><th>Actions</th></tr>
+    {% for a in accounts %}
+      <tr>
+        <td>{{ a.label }}</td>
+        <td>{{ services[a.service].display_name if a.service in services else a.service }}</td>
+        <td>{{ a.account_type }}</td>
+        <td>{{ a.username }}</td>
+        <td>
+          {% if not a.enabled %}<span class="badge badge-muted">Disabled</span>
+          {% elif a.needs_reauth %}<span class="badge badge-warn">Needs authentication</span>
+          {% else %}<span class="badge badge-ok">Authenticated</span>{% endif %}
+        </td>
+        <td class="actions">
+          <form method="post" action="{{ url_for('main.toggle_account', account_id=a.id) }}">
+            <button type="submit" class="btn btn-sm">{{ 'Disable' if a.enabled else 'Enable' }}</button>
+          </form>
+          <form method="post" action="{{ url_for('main.reauth_account', account_id=a.id) }}">
+            <button type="submit" class="btn btn-sm">Authenticate / Re-authenticate</button>
+          </form>
+          <form method="post" action="{{ url_for('main.delete_account', account_id=a.id) }}" onsubmit="return confirm('Remove this account?');">
+            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>No accounts configured.</p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Dashboard</h1>
+  <form method="post" action="{{ url_for('main.run_now') }}">
+    <button type="submit" class="btn btn-primary">Run now (test)</button>
+  </form>
+
+  <h2>Configured accounts</h2>
+  {% if accounts %}
+  <table class="table">
+    <tr><th>Label</th><th>Service</th><th>Status</th></tr>
+    {% for a in accounts %}
+      <tr>
+        <td>{{ a.label }}</td>
+        <td>{{ a.service }}</td>
+        <td>
+          {% if not a.enabled %}<span class="badge badge-muted">Disabled</span>
+          {% elif a.needs_reauth %}<span class="badge badge-warn">Needs authentication</span>
+          {% else %}<span class="badge badge-ok">Authenticated</span>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>No accounts configured yet. Go to <a href="{{ url_for('main.accounts') }}">Accounts</a> to add one.</p>
+  {% endif %}
+
+  <h2>Recent runs</h2>
+  {% if runs %}
+  <table class="table">
+    <tr><th>Account</th><th>Started</th><th>Status</th><th>Detail</th></tr>
+    {% for r in runs %}
+      <tr>
+        <td>{{ r.account_label }}</td><td>{{ r.started_at }}</td>
+        <td>
+          {% if r.status == 'success' %}<span class="badge badge-ok">Success</span>
+          {% elif r.status == 'needs_reauth' %}<span class="badge badge-warn">Needs re-auth</span>
+          {% elif r.status == 'no_new_invoice' %}<span class="badge badge-muted">No new invoice</span>
+          {% elif r.status == 'running' %}<span class="badge badge-muted">Running</span>
+          {% elif r.status == 'skipped' %}<span class="badge badge-muted">Skipped</span>
+          {% else %}<span class="badge badge-error">Failed</span>{% endif %}
+        </td>
+        <td>{{ r.detail }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+  {% else %}<p>No runs yet.</p>{% endif %}
+{% endblock %}
